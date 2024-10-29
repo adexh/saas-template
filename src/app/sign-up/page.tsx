@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Label } from '@/components/ui/label'
 import { EyeOff, Eye } from 'lucide-react'
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 
 
 function Signup() {
@@ -48,9 +49,12 @@ function Signup() {
       })
 
       setPendingVerify(true);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      setError(error.errors[0].message);
+
+      if( isClerkAPIResponseError(error) ) {
+        setError(error.errors[0].message);
+      }
     }
   }
 
@@ -72,9 +76,12 @@ function Signup() {
         router.push("/dashboard");
       }
 
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      setError(error.errors[0].message);
+
+      if( isClerkAPIResponseError(error) ) {
+        setError(error.errors[0].message);
+      }
     }
   }
 
