@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher(["/","/api/webhook/register", "/sign-in", "/sign-up"]);
@@ -6,7 +6,8 @@ const isUserRoute = createRouteMatcher(["/dashboard", "/api/todos"]);
 const isAdminRoute = createRouteMatcher(["/admin/dashboard"]);
 
 export default clerkMiddleware( async (auth, req) => {  
-  const { has, sessionId } = await auth();
+  const { sessionId, userId } = await auth();
+  const client = await clerkClient();
   
   if( !sessionId && !isPublicRoute(req) ) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
@@ -15,12 +16,14 @@ export default clerkMiddleware( async (auth, req) => {
   if( sessionId ) {
     try {
       // If user is signed-in, but not admin, fallback to dashboard
-      if( isAdminRoute(req) && !has({ permission: "org:admin" }) ) {
+      const { role } = (await client.users?.getUser(userId)).privateMetadata;
+
+      if( isAdminRoute(req) && role !== "admin" ) {
         return NextResponse.redirect(new URL("/sign-in", req.url));
       }
 
       // Redirect admin to admin dashboard
-      if( has({ permission: "org:admin" }) && isUserRoute(req) ) {
+      if( role === "admin" && isUserRoute(req) ) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       }
 
