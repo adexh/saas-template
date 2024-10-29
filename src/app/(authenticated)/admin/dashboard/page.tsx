@@ -40,6 +40,8 @@ export default function AdminDashboard() {
           description: "User data fetched successfully.",
         });
       } catch (error) {
+        console.log(error);
+        
         toast({
           title: "Error",
           description: "Failed to fetch user data. Please try again.",
@@ -84,6 +86,7 @@ export default function AdminDashboard() {
         description: "Subscription updated successfully.",
       });
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to update subscription. Please try again.",
@@ -111,6 +114,7 @@ export default function AdminDashboard() {
       fetchUserData(currentPage);
       toast({ title: "Success", description: "Todo updated successfully." });
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to update todo. Please try again.",
@@ -134,6 +138,7 @@ export default function AdminDashboard() {
       fetchUserData(currentPage);
       toast({ title: "Success", description: "Todo deleted successfully." });
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to delete todo. Please try again.",

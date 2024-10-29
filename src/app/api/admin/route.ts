@@ -5,12 +5,13 @@ import prisma from "@/lib/prisma";
 const ITEMS_PER_PAGE = 10;
 
 async function isAdmin(userId: string) {
-  const user = await clerkClient.users.getUser(userId);
-  return user.publicMetadata.role === "admin";
+  const client = await clerkClient()
+  const user = await client.users.getUser(userId);
+  return user.privateMetadata.role === "admin";
 }
 
 export async function GET(req: NextRequest) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId || !(await isAdmin(userId))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,6 +43,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ user, totalPages, currentPage: page });
   } catch (error) {
+    console.error(error);
+    
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -50,7 +53,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId || !(await isAdmin(userId))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -84,6 +87,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ message: "Update successful" });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -92,7 +96,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId || !(await isAdmin(userId))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -114,6 +118,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "Todo deleted successfully" });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

@@ -6,7 +6,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,7 +14,7 @@ export async function PUT(
 
   try {
     const { completed } = await req.json();
-    const todoId = params.id;
+    const { id: todoId} = params;
 
     const todo = await prisma.todo.findUnique({
       where: { id: todoId },
@@ -35,6 +35,8 @@ export async function PUT(
 
     return NextResponse.json(updatedTodo);
   } catch (error) {
+    console.error(error);
+    
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -46,14 +48,14 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const todoId = params.id;
+    const { id: todoId } = params;
 
     const todo = await prisma.todo.findUnique({
       where: { id: todoId },
@@ -73,6 +75,8 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Todo deleted successfully" });
   } catch (error) {
+    console.log(error);
+    
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

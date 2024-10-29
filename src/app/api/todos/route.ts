@@ -50,6 +50,8 @@ export async function GET(req: NextRequest) {
       totalPages,
     });
   } catch (error) {
+    console.log(error);
+    
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
